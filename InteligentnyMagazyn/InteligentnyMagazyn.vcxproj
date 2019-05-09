@@ -145,6 +145,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="MainPanel.resx">
+      <DependentUpon>MainPanel.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="StartWindow.resx">
       <DependentUpon>StartWindow.h</DependentUpon>
     </EmbeddedResource>

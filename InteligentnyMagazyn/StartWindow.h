@@ -1,4 +1,5 @@
 #pragma once
+#include "MainPanel.h"
 
 namespace InteligentnyMagazyn {
 
@@ -36,13 +37,6 @@ namespace InteligentnyMagazyn {
 			}
 		}
 	private: System::Windows::Forms::Timer^  timerLoarding;
-	protected:
-
-
-
-
-
-	protected:
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -94,9 +88,12 @@ namespace InteligentnyMagazyn {
 				this->BackgroundImage = Image::FromFile("images\\startWindow\\start" + indexImage + ".jpg");
 				indexImage++;
 			}
-			else if (indexImage == 3) {
+			else if (indexImage == 4) {
 				// Zmiana okna zawartoœæ
 				this->timerLoarding->Enabled = false;
+				MainPanel^ mainPanel = gcnew MainPanel();
+				mainPanel->Show();
+				StartWindow::Form::Hide();
 			}
 		}
 	private: System::Void timerLoading_Tick(System::Object^  sender, System::EventArgs^  e) {
