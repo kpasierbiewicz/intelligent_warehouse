@@ -90,10 +90,11 @@ namespace InteligentnyMagazyn {
 			}
 			else if (indexImage == 4) {
 				// Zmiana okna zawartoœæ
+				this->Hide();
 				this->timerLoarding->Enabled = false;
 				MainPanel^ mainPanel = gcnew MainPanel();
-				mainPanel->Show();
-				StartWindow::Form::Hide();
+				mainPanel->ShowDialog();
+				this->Close();
 			}
 		}
 	private: System::Void timerLoading_Tick(System::Object^  sender, System::EventArgs^  e) {
