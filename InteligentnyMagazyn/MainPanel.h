@@ -8,6 +8,7 @@ namespace InteligentnyMagazyn {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace MySql::Data::MySqlClient;
 
 	/// <summary>
 	/// Podsumowanie informacji o MainPanel
@@ -40,6 +41,12 @@ namespace InteligentnyMagazyn {
 	private: System::Windows::Forms::Button^  databasesDelivererButton;
 	private: System::Windows::Forms::Button^  searchButton;
 	private: System::Windows::Forms::Button^  editDatabaseButton;
+	private: System::Windows::Forms::DataGridView^  dataGridView;
+	private: System::Windows::Forms::TextBox^  searchTextBox;
+	private: System::Windows::Forms::Button^  elementSearchButton;
+
+
+
 
 	protected:
 
@@ -63,6 +70,10 @@ namespace InteligentnyMagazyn {
 			this->databasesDelivererButton = (gcnew System::Windows::Forms::Button());
 			this->searchButton = (gcnew System::Windows::Forms::Button());
 			this->editDatabaseButton = (gcnew System::Windows::Forms::Button());
+			this->dataGridView = (gcnew System::Windows::Forms::DataGridView());
+			this->searchTextBox = (gcnew System::Windows::Forms::TextBox());
+			this->elementSearchButton = (gcnew System::Windows::Forms::Button());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// databaseElementsButton
@@ -162,13 +173,48 @@ namespace InteligentnyMagazyn {
 			this->editDatabaseButton->Visible = false;
 			this->editDatabaseButton->Click += gcnew System::EventHandler(this, &MainPanel::editDatabaseButton_Click);
 			// 
+			// dataGridView
+			// 
+			this->dataGridView->AllowUserToAddRows = false;
+			this->dataGridView->AllowUserToDeleteRows = false;
+			this->dataGridView->AllowUserToOrderColumns = true;
+			this->dataGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dataGridView->Location = System::Drawing::Point(582, 340);
+			this->dataGridView->Name = L"dataGridView";
+			this->dataGridView->RowTemplate->Height = 24;
+			this->dataGridView->Size = System::Drawing::Size(1215, 520);
+			this->dataGridView->TabIndex = 6;
+			this->dataGridView->Visible = false;
+			// 
+			// searchTextBox
+			// 
+			this->searchTextBox->Location = System::Drawing::Point(599, 892);
+			this->searchTextBox->Name = L"searchTextBox";
+			this->searchTextBox->Size = System::Drawing::Size(233, 22);
+			this->searchTextBox->TabIndex = 7;
+			this->searchTextBox->Visible = false;
+			// 
+			// elementSearchButton
+			// 
+			this->elementSearchButton->Location = System::Drawing::Point(877, 881);
+			this->elementSearchButton->Name = L"elementSearchButton";
+			this->elementSearchButton->Size = System::Drawing::Size(116, 45);
+			this->elementSearchButton->TabIndex = 8;
+			this->elementSearchButton->Text = L"Szukaj";
+			this->elementSearchButton->UseVisualStyleBackColor = true;
+			this->elementSearchButton->Visible = false;
+			this->elementSearchButton->Click += gcnew System::EventHandler(this, &MainPanel::elementSearchButton_Click);
+			// 
 			// MainPanel
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Dpi;
 			this->AutoSize = true;
 			this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
-			this->ClientSize = System::Drawing::Size(1710, 850);
+			this->ClientSize = System::Drawing::Size(1710, 997);
+			this->Controls->Add(this->elementSearchButton);
+			this->Controls->Add(this->searchTextBox);
+			this->Controls->Add(this->dataGridView);
 			this->Controls->Add(this->editDatabaseButton);
 			this->Controls->Add(this->searchButton);
 			this->Controls->Add(this->databasesDelivererButton);
@@ -181,7 +227,9 @@ namespace InteligentnyMagazyn {
 			this->Text = L"Inteligentny Magazyn";
 			this->WindowState = System::Windows::Forms::FormWindowState::Maximized;
 			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &MainPanel::MainPanel_FormClosed);
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView))->EndInit();
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
@@ -193,11 +241,34 @@ namespace InteligentnyMagazyn {
 		bool databasesDelivererButtonClick = false;
 		bool editDatabaseButtonClick = false;
 		bool searchButtonClick = false;
+
+		String^ configurationConnect = L"datasource=localhost;port=3306;username=root;password=cloudek93;database=InteligentnyMagazyn";
 	
-		private: void firstStanWhenStartProgram() {
+	private: void firstStanWhenStartProgram() {
 			editDatabaseButtonClick = false;
 			searchButtonClick = true;
+	}
+
+	private: void loadData(String^ tableName) {
+		MySqlConnection^ connectToDatabase = gcnew MySqlConnection(configurationConnect);
+		MySqlCommand^ query = gcnew MySqlCommand("SELECT * FROM " + tableName, connectToDatabase);
+
+		try
+		{
+			MySqlDataAdapter^ deliverData = gcnew MySqlDataAdapter();
+			deliverData->SelectCommand = query;
+			DataTable ^deliverTable = gcnew DataTable();
+			deliverData->Fill(deliverTable);
+			BindingSource^ source = gcnew BindingSource();
+			source->DataSource = deliverTable;
+			this->dataGridView->DataSource = source;
+			connectToDatabase->Close();
 		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show(ex->Message);
+		}
+	}
 	private: System::Void MainPanel_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
 		if (MessageBox::Show("Zamkniêcie aplikacji", "Czy na pewno chcesz zakoñczyæ?",
 			MessageBoxButtons::YesNo, MessageBoxIcon::Question) == System::Windows::Forms::DialogResult::Yes) {
@@ -272,7 +343,40 @@ namespace InteligentnyMagazyn {
 		if (databaseElementsButtonClick) this->BackgroundImage = Image::FromFile("images\\imgPanels\\okno2-1.jpg");
 		else if (databaseToolsButtonClick) this->BackgroundImage = Image::FromFile("images\\imgPanels\\okno3-1.jpg");
 		else if (databseBigElementsButtonClick) this->BackgroundImage = Image::FromFile("images\\imgPanels\\okno4-1.jpg");
-		else if (databasesDelivererButtonClick) this->BackgroundImage = Image::FromFile("images\\imgPanels\\okno5-1.jpg");
+		else if (databasesDelivererButtonClick) {
+			this->BackgroundImage = Image::FromFile("images\\imgPanels\\okno5-1.jpg");
+			if (this->dataGridView->Visible == false) {
+				this->dataGridView->Visible = true;
+				this->searchTextBox->Visible = true;
+				this->elementSearchButton->Visible = true;
+			}
+			// Baza danych
+			loadData("Dostawcy");
+		}
 	}
-	};
+	private: System::Void elementSearchButton_Click(System::Object^  sender, System::EventArgs^  e) {
+
+		if (databasesDelivererButtonClick) {
+			String^ elementText = this->searchTextBox->Text;
+			MySqlConnection^ connectToDatabase = gcnew MySqlConnection(configurationConnect);
+			MySqlCommand^ query = gcnew MySqlCommand("SELECT * FROM Dostawcy WHERE CONCAT(nazwa,' ',kategoria) LIKE '%" + elementText + "%';", connectToDatabase);
+
+			try
+			{
+				MySqlDataAdapter^ deliverData = gcnew MySqlDataAdapter();
+				deliverData->SelectCommand = query;
+				DataTable ^deliverTable = gcnew DataTable();
+				deliverData->Fill(deliverTable);
+				BindingSource^ source = gcnew BindingSource();
+				source->DataSource = deliverTable;
+				this->dataGridView->DataSource = source;
+				connectToDatabase->Close();
+			}
+			catch (Exception^ ex)
+			{
+				MessageBox::Show(ex->Message);
+			}
+		}
+	}
+};
 }

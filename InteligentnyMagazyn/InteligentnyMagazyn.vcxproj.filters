@@ -29,9 +29,15 @@
     <ClInclude Include="MainPanel.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="IntelligentWarehouseDatabase.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="StartWindow.resx">
+      <Filter>Pliki zasobów</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainPanel.resx">
       <Filter>Pliki zasobów</Filter>
     </EmbeddedResource>
   </ItemGroup>
